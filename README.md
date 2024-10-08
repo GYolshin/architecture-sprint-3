@@ -1,3 +1,17 @@
+# Задания 3 спринта
+
+## 1.1
+См. файл ./docs/1.1 monolith-context.puml
+
+## 1.2
+См. файлы: 
+1. ./docs/1.2 container.puml
+2. ./docs/1.2 component.puml 
+3. ./docs/1.2 classes.puml
+
+Остальные задания в процессе
+
+
 # Базовая настройка
 
 ## Запуск minikube
