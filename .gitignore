@@ -194,4 +194,4 @@ tmp/
 task-*
 
 ### Plant UML rendering results ###
-.png
+docs/*.png
