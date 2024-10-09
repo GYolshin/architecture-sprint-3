@@ -1,0 +1,82 @@
+@startuml
+
+package UserManagement{
+	
+	object User{
+		id: int
+		name: string
+		status: UserStatuses
+		tariff: Tariff
+		house_id: UID
+	}
+
+	object House {
+		id: UID
+		devices: Array(device)
+		sensors: Array(sensor)
+	}
+
+	object Device {
+		MACAddress: string
+	}
+}
+
+
+package DeviceManagement{
+
+	object DeviceManagement.House {
+		id: UID
+	}
+
+	object DeviceManagement.Device{
+		MACAddress: string
+		status: Status
+	}
+
+	object BoilerController
+
+	object GasPressureSensor
+
+	object TemperatureSensor
+
+	object TemperatureController
+
+
+	object Econometer{
+		MACAddress: string
+	}
+
+	object HeatConductorPressureSensor{
+		MACAddress: string
+	}
+
+	object Interval{
+
+		start: DateTime
+		end: DateTime
+		value: decimal
+	}
+
+	object TemperatureSchedule{
+		schedule: Array(Interval)
+	}
+}
+
+
+' =====================================
+' Relations
+' =====================================
+House ||--o{ Device
+House }|--|{ User
+BoilerController ||--|| GasPressureSensor
+BoilerController ||--|{ TemperatureSensor
+BoilerController ||--|| TemperatureController
+BoilerController ||--|| HeatConductorPressureSensor
+
+DeviceManagement.House ||--|{ BoilerController
+DeviceManagement.House ||--|{ Econometer
+
+
+TemperatureSchedule ||--|{ Interval
+
+@enduml
