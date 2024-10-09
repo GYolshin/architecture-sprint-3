@@ -9,6 +9,9 @@
 2. ./docs/1.2 component.puml 
 3. ./docs/1.2 classes.puml
 
+## 1.3
+См. файл ./docs/1.3 er.puml
+
 Остальные задания в процессе
 
 
