@@ -28,37 +28,68 @@ package DeviceManagement{
 		id: UID
 	}
 
-	object DeviceManagement.Device{
+	object BoilerController{
+
+		id: UID
+		MACAddress: string
+		status: Status
+		house_id: UID 
+	}
+
+	object BoilerConfiguration{
+		boilerId: UID
+		deviceId: UID
+	}
+
+	object GasPressureSensor{
+
+		id: UID
 		MACAddress: string
 		status: Status
 	}
 
-	object BoilerController
+	object TemperatureSensor{
 
-	object GasPressureSensor
+		id: UID
+		MACAddress: string
+		status: Status
+	}
 
-	object TemperatureSensor
+	object TemperatureController{
 
-	object TemperatureController
+		id: UID
+		MACAddress: string
+		status: Status
+	}
 
 
 	object Econometer{
+		id: UID
 		MACAddress: string
+		house_id: UID
 	}
 
 	object HeatConductorPressureSensor{
+
+		id: UID
 		MACAddress: string
 	}
 
 	object Interval{
-
+		id: UID
 		start: DateTime
 		end: DateTime
 		value: decimal
 	}
 
 	object TemperatureSchedule{
-		schedule: Array(Interval)
+		id: UID
+		activeFrom: DateTime
+	}
+
+	object ScheduleIntervals{
+		scheduleI: UID
+		inervalId: UID
 	}
 }
 
@@ -68,15 +99,18 @@ package DeviceManagement{
 ' =====================================
 House ||--o{ Device
 House }|--|{ User
-BoilerController ||--|| GasPressureSensor
-BoilerController ||--|{ TemperatureSensor
-BoilerController ||--|| TemperatureController
-BoilerController ||--|| HeatConductorPressureSensor
+
+BoilerController ||--|| BoilerConfiguration
+BoilerConfiguration ||--|| GasPressureSensor
+BoilerConfiguration ||--|{ TemperatureSensor
+BoilerConfiguration ||--|| TemperatureController
+BoilerConfiguration ||--|| HeatConductorPressureSensor
 
 DeviceManagement.House ||--|{ BoilerController
 DeviceManagement.House ||--|{ Econometer
 
 
-TemperatureSchedule ||--|{ Interval
+TemperatureSchedule ||--|{ ScheduleIntervals
+ScheduleIntervals ||--|{ Interval
 
 @enduml
