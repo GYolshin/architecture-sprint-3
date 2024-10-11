@@ -12,6 +12,9 @@
 ## 1.3
 См. файл ./docs/1.3 er.puml
 
+## 1.4
+См. фвйл ./docs/1.4 data-processor-swagger.yaml
+
 Остальные задания в процессе
 
 

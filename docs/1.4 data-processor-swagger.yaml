@@ -1,0 +1,143 @@
+swagger: "2.0"
+schemes: 
+  - https
+host: smart-home.com
+basePath: /api/v1/
+
+info:
+  title: "Data processor microservice, extract from sensors and provide metering data to consumers"
+  version: "1.0.0"
+  description: |
+    Microservice extracts emtering events from Kafka, and then store it in relational database
+    
+
+tags:
+  - name: devices
+    description: all devices functions to process data
+  - name: processor
+    description: management interface to configure processor
+
+paths:
+  '/sensor/{sensorId}/history':
+    get:
+      tags: 
+        - devices
+      summary: Get metering data history page
+      
+      parameters:
+        - name: sensorId
+          type: string
+          in: path
+          required: true
+          
+      produces:
+        - application/json
+          
+      responses:
+      
+        '200':
+          description: Success
+          schema: 
+            $ref: '#/definitions/history'
+            
+        '404':
+          description: Data not found for {sensorId}
+          schema:
+            type: string
+        
+        '403':
+          description: Operation is not allowed for {User}
+          schema:
+            type: string
+
+              
+  '/processor/configuration/':
+    get:
+      tags: 
+        - processor
+      summary: get current configuration
+
+      produces:
+        - application/json
+
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/configuration'
+          
+        '403':
+          description: Operation is not allowed for {User}
+          schema:
+            type: string
+    
+    patch: 
+      tags:
+        - processor
+      summary: Edit configuration parameters
+      
+      parameters:
+        - name: configuration
+          in: body
+          schema:
+            $ref: '#/definitions/configuration'
+            
+      responses:
+        
+        '200':
+          description: Specified parameters successfully applied
+          schema:
+            type: string
+        
+        '403':
+          description: Operation is not allowed for {User}
+          schema:
+            type: string
+                
+definitions:
+  configuration:
+    type: object
+    properties:
+      houseId:
+        description: UID of house where processor installed
+        type: string
+        example: cc9964e5-34ec-4ad6-a349-a103bb5c4867
+        
+      eventBusAddress: 
+        description: address of events provider
+        type: string
+        example: 192.168.10.1
+        
+      dbConnectionString:
+        type: string
+        example: |
+          User ID=root;Password=myPassword;Host=localhost;Port=5432;Database=myDataBase;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;
+  
+  history:
+    type: array
+    items: 
+      type: object
+      properties: 
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: double
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
