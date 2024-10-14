@@ -1,0 +1,30 @@
+@startuml
+!include ./templates/c4_context.puml
+
+Person(users, "Customer", "Smart home owner", $sprite="users")
+Person(sensors, "Sensors", "Providers of metering information", $sprite="robot")
+Person(devices, "Devices", "Allow to manage smart home system", $sprite="robot")
+Person(engeneer, "Engeneer", "Initial adjust system and support", $sprite="users")
+
+System_Boundary(c1, "Smart home system"){
+
+	System(mobileApp, "Mobile application", $descr = "")
+	System(webApp, "Web application", $descr = "")
+	System(backend, "Backend", $descr = "")
+
+	System(controller, "Controller", $descr = "Home based, coordinates devices work and provide management interface")
+}
+
+
+Rel_D(users, mobileApp, "uses")
+Rel_D(users, webApp, "uses")
+Rel_D(engeneer, webApp, "adjustments")
+Rel_D(webApp, backend, "")
+Rel_D(mobileApp, backend, "")
+
+Rel_D(backend, controller, "user commands")
+Rel_R(sensors, controller, "provide data")
+Rel_R(controller, devices, "send commands")
+Rel_U(controller, backend, "metering data")
+
+@enduml

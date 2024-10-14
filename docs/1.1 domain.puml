@@ -1,0 +1,21 @@
+@startuml
+!include ./templates/c4_context.puml
+
+System_Boundary(c1, "Device management"){
+
+	System(deviceManagement, "Microservice: Device management", $descr = "")
+	System(meteringDataProcessing, "Microservice: Metering data processing")
+	System(deviceController, "Device controller application")
+	System(systemMonitoring, "Microservice: Monitoring")
+}
+
+System_Boundary(c2, "User management"){
+
+	System(profilesManagment, "Microservice: Profiles management")
+	System(billing, "Microservice: Billing")
+	System(notifications, "Microservice: Notifications")
+}
+
+
+
+@enduml

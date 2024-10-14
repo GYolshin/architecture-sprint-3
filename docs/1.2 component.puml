@@ -1,0 +1,29 @@
+@startuml
+!include ./templates/c4_component.puml
+
+Container(apiGateway, "API gateway", "Kong")
+
+Container_Boundary(c1, "Data processor"){
+
+	Component(api, "API", "Java", $descr = "Provide user interface to metering data")
+	Component(job, "Processors job", "Java", $descr = "Discrete read accumulated to the moment metering events and push them to db")
+	Component(meteringDataRepository, "Metering data repository", "Java", $descr = "Set/Retrieve data from storage")
+}
+
+ContainerQueue(sensorsEventStreams, "Event streams", "Kafka")
+ContainerDb(meteringDataMaster, "Metering Data - master", "ClickHouse", $descr = "Store metering data from sensors for read and write purpose")
+ContainerDb(meteringDataReadReplica, "Metering Data - read replica", "ClickHouse", $descr = "Store metering data from sensors for read only purpose")
+
+
+' =====================================
+' Relations
+' =====================================
+Rel_D(apiGateway, api, "")
+Rel_D(api, meteringDataRepository, "")
+Rel_D(meteringDataRepository, meteringDataMaster, "write requests")
+Rel_D(meteringDataRepository, meteringDataReadReplica, "read requests")
+Rel_D(sensorsEventStreams, job, "metering data")
+Rel_D(job, meteringDataRepository, "")
+Rel_R(meteringDataMaster, meteringDataReadReplica, "sync")
+
+@enduml

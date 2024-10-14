@@ -1,0 +1,291 @@
+swagger: "2.0"
+schemes: 
+  - https
+host: smart-home.com
+basePath: /api/v1/
+
+info:
+  title: Data processor microservice, extract from sensors and provide metering data to consumers
+  version: "1.0.0"
+  description: |
+    Microservice extracts metering events from Kafka, and then store it in relational database
+    
+
+tags:
+  - name: Device manager
+    description: all devices functions to process data
+  - name: Data processor
+    description: management interface to configure processor
+
+paths:
+  '/sensor/{sensorId}/history':
+    get:
+      tags: 
+        - Data processor
+      summary: Get metering data history page
+      
+      parameters:
+        - name: sensorId
+          type: string
+          in: path
+          required: true
+          description: Идентификатор сенсора с которого требуется получить данные
+          
+        - name: page
+          in: query
+          type: number
+          required: true
+          description: Порядковый номер страницы, которую необходимо вернуть
+          
+        - name: pageSize
+          in: query
+          type: number
+          required: true
+          description: Количество записей на странице
+          
+          
+      produces:
+        - application/json
+          
+      responses:
+      
+        '200':
+          description: Success
+          schema: 
+            $ref: '#/definitions/history'
+            
+        '404':
+          description: Data not found for {sensorId}
+          schema:
+            type: string
+        
+        '403':
+          description: Operation is not allowed for {User}
+          schema:
+            type: string
+
+  '/sensor/{sensorId}/history/statistics':
+    get:
+      tags:
+        - Data processor
+      summary: get statistics metrics (AVG - average, MED - median, MAX - maximum, MIN - minimum, default - all)
+
+      parameters: 
+        - name: sensorId
+          type: string
+          in: path
+          required: true
+          description: Идентификатор сенсора с которого требуется получить данные
+
+        - name: type
+          type: string
+          in: query
+          required: false
+          
+      produces:
+        - application/json
+        
+      responses: 
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/statistics'
+              
+  '/processor/configuration/':
+    get:
+      tags: 
+        - Data processor
+      summary: get current configuration
+
+      produces:
+        - application/json
+
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/configuration'
+          
+        '403':
+          description: Operation is not allowed for {User}
+          schema:
+            type: string
+    
+    patch: 
+      tags:
+        - Data processor
+      summary: Edit configuration parameters
+      
+      parameters:
+        - name: configuration
+          in: body
+          schema:
+            $ref: '#/definitions/configuration'
+            
+      responses:
+        
+        '200':
+          description: Specified parameters successfully applied
+          schema:
+            type: string
+        
+        '403':
+          description: Operation is not allowed for {User}
+          schema:
+            type: string
+            
+  '/device/{deviceId}':
+    
+    get:
+      tags:
+        - Device manager
+        
+      summary: Get specified device configuration
+      
+      parameters:
+        - name: deviceId
+          in: path
+          type: string
+          required: true
+      
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/deviceConfiguration'
+        
+        '403':
+          description: Operation is not allowed for user
+          schema:
+            type: string
+            
+  '/device': 
+    post:
+      tags:
+        - Device manager
+        
+      summary: Add new device into system
+      
+      parameters: 
+        - name: configuration
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/deviceConfiguration'
+      
+      responses:
+        '200':
+          description: Success
+        
+        '403':
+          description: Operation is not allowed for user
+          schema:
+            type: string
+            
+    patch:
+      tags:
+        - Device manager
+        
+      summary: Set specified property
+      
+      parameters: 
+        - name: configuration
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/deviceConfiguration'
+      
+      responses:
+        '200':
+          description: Success
+          schema: 
+            type: string
+        
+        '403':
+          description: Operation is not allowed for user
+          schema:
+            type: string
+        
+        '406':
+          description: Specified parameters is not allowed to change
+          schema:
+            type: string
+        
+        '400':
+          description: Required parameter deviceId not found
+          schema:
+            type: string
+        
+                
+definitions:
+  configuration:
+    type: object
+    properties:
+      houseId:
+        description: UID of house where processor installed
+        type: string
+        example: cc9964e5-34ec-4ad6-a349-a103bb5c4867
+        
+      eventBusAddress: 
+        description: address of events provider
+        type: string
+        example: 192.168.10.1
+        
+      dbConnectionString:
+        type: string
+        example: |
+          User ID=root;Password=myPassword;Host=localhost;Port=5432;Database=myDataBase;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;
+  
+  history:
+    type: array
+    items: 
+      type: object
+      properties: 
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: double
+
+  statistics:
+    type: array
+    items:
+      type: object
+      properties:
+        type:
+          type: string
+          format: enum
+          enum: 
+            - AVG
+            - MED
+            - MAX
+            - MIN
+            
+  deviceConfiguration:
+    type: object
+    properties:
+      deviceId:
+        type: string
+      houseId: 
+        type: string
+        description: House where particular device located
+      MACAddress:
+        type: string
+      embeddedSensors: 
+        type: array
+        items:
+          type: string
+          description: Array of sensor ids
+      power:
+        type: number
+      status:
+        type: string
+        enum:
+          - ON
+          - OFF
+          - ERROR
+      error:
+        type: number
+      errorDescription: 
+        type: string

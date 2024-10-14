@@ -1,0 +1,53 @@
+@startuml
+!include ./templates/c4_container.puml
+
+Container_Boundary(c1, "Processor job"){
+
+	object IHistoryBatch{
+
+	}
+
+	object temperatureHistoryBatch{
+		data: Array(datapoint)
+	}
+
+	object electricityConsumptionHistoryBatch{
+		data: Array(datapoint)
+	}
+
+	object datapoint{
+		datetime: DateTime
+		point: double
+	}
+
+	object sensor{
+
+		+ ctor(id, type)
+
+		+ loadNewBatch(): IHistoryBatch
+	}	
+
+	object loadDataJob{
+
+		+ load()
+
+		- sensors: Array(sensor)
+		- save(sensorId, IHistoryBatch)
+		- compress(degreeOfAccuracy, IHistoryBatch)
+
+	}
+}
+
+' =====================================
+' Relations
+' =====================================
+temperatureHistoryBatch <|-- IHistoryBatch
+electricityConsumptionHistoryBatch <|-- IHistoryBatch  
+datapoint *-- temperatureHistoryBatch
+datapoint *-- electricityConsumptionHistoryBatch
+sensor *-- temperatureHistoryBatch
+sensor *-- electricityConsumptionHistoryBatch
+loadDataJob o-- sensor
+
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml
+!include ./templates/c4_container.puml
+
+System(mobileApp, "Mobile application", $descr = "")
+System(webApp, "Web application", $descr = "")
+
+
+System_Boundary(backend, "Smart home system backend"){
+
+	Container(apiGateway, "API gateway", "Kong", "Load balancing, authorization")
+	Container(meteringDataProcessor, "Data processor", "Java", $descr = "Process and retreive metering data from sensors, paging")
+	ContainerDb(meteringData, "Metering Data", "ClickHouse", $descr = "Store metering data from sensors")
+
+	Container(deviceManager, "Device manager", "Java", $descr = "Implement device management scenarion like temperature control, set temperature")
+	ContainerDb(deviceManagementDb, "Device management database", "PostgreSQL", $descr = "Store device configurations")
+	ContainerQueue(sensorsEventStreams, "Event streams", "Kafka", $descr = "Accumulate all events from controllers")
+
+	Container(userManagement, "User management", "Java", $descr = "Manage user profiles, statuses, subscriptions")
+	ContainerDb(userManagementDb, "User management database", "PostgreSQL", $descr = "Store user profiles, subscriptions")
+}
+
+System(controller, "Controller")
+
+
+' =====================================
+' Relations
+' =====================================
+Rel_D(mobileApp, apiGateway, "")
+Rel_D(webApp, apiGateway, "")
+Rel_D(apiGateway, meteringDataProcessor, "Get metering data page")
+Rel_D(meteringDataProcessor, meteringData, "Set metering data")
+Rel_U(sensorsEventStreams, meteringDataProcessor, "Get sensors/devices events")
+Rel_U(controller, sensorsEventStreams, "Send metering data")
+
+Rel_D(apiGateway, deviceManager, "User commands")
+Rel_D(deviceManager, controller, "Device commands")
+Rel_D(deviceManager, deviceManagementDb, "")
+Rel_U(sensorsEventStreams, deviceManager, "Events that should trigger devices commands or notifications")
+Rel_U(deviceManager, mobileApp, "Push notifications through web sockets")
+Rel_U(deviceManager, webApp, "Push notifications through web sockets")
+
+
+Rel_D(apiGateway, userManagement, "")
+Rel_D(userManagement, userManagementDb, "")
+
+@enduml
